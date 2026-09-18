@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Barbearia Capitão — Barba · Cabelo · Bigode | Francisco Morato</title>
+  <meta name="description" content="Barbearia Capitão em Francisco Morato. Corte, barba, bigode e corte kids. Agende seu horário online." />
+  <meta name="theme-color" content="#0a0b0d" />
+  <link rel="icon" href="assets/img/logo.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Símbolo do Capitão (reutilizável) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="capitao" viewBox="0 0 120 140">
+      <path d="M16 42 C26 10 94 10 104 42 Z" fill="currentColor"/>
+      <rect x="20" y="40" width="80" height="13" rx="2" fill="currentColor"/>
+      <rect x="20" y="44" width="80" height="5" fill="var(--sym-cut, #0a0b0d)"/>
+      <path d="M54 28 l6 -6 l6 6 l-6 6 z" fill="var(--sym-cut, #0a0b0d)"/>
+      <path d="M24 53 Q60 66 96 53 L92 60 Q60 72 28 60 Z" fill="currentColor"/>
+      <rect x="31" y="66" width="24" height="13" rx="6" fill="currentColor"/>
+      <rect x="65" y="66" width="24" height="13" rx="6" fill="currentColor"/>
+      <rect x="54" y="69" width="12" height="3" fill="currentColor"/>
+      <path d="M26 72 C25 112 44 134 60 136 C76 134 95 112 94 72 L89 76 C87 92 78 98 60 98 C42 98 33 92 31 76 Z" fill="currentColor"/>
+      <path d="M42 99 Q51 91 60 96 Q69 91 78 99 Q69 103 60 100 Q51 103 42 99 Z" fill="var(--sym-cut, #0a0b0d)"/>
+    </symbol>
+    <symbol id="i-ig" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.3" fill="currentColor"/></symbol>
+    <symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></symbol>
+    <symbol id="i-scissors" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></g></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M17 9l5 6M22 9l-5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  </svg>
+
+  <!-- ========== PRELOADER ========== -->
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <div class="preloader__inner">
+      <div class="pole"><span></span></div>
+      <img src="assets/img/logo.jpg" alt="" class="preloader__logo" />
+      <div class="preloader__bar"><span id="preloaderBar"></span></div>
+      <p class="preloader__txt">Afiando a navalha<span class="dots"></span></p>
+    </div>
+  </div>
+
+  <!-- Cursor personalizado -->
+  <div class="cursor" id="cursor" aria-hidden="true"><svg><use href="#i-scissors"/></svg></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- ========== NAV ========== -->
+  <header class="nav" id="nav">
+    <a href="#inicio" class="nav__brand" aria-label="Barbearia Capitão — início">
+      <img src="assets/img/logo.jpg" alt="Logo Barbearia Capitão" />
+      <span>Capitão<small>Barba · Cabelo · Bigode</small></span>
+    </a>
+    <nav class="nav__links" id="navLinks">
+      <a href="#casa">A Casa</a>
+      <a href="#servicos">Serviços</a>
+      <a href="#galeria">Instagram</a>
+      <a href="#local">Onde estamos</a>
+      <a href="#agendar" class="btn btn--sm btn--sky nav__cta">Agendar</a>
+    </nav>
+    <button class="nav__sound" id="soundBtn" aria-label="Ligar sons da barbearia" title="Sons da barbearia">
+      <svg><use href="#i-mute"/></svg>
+    </button>
+    <button class="nav__burger" id="burger" aria-label="Abrir menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </header>
+
+  <main>
+    <!-- ========== HERO ========== -->
+    <section class="hero" id="inicio">
+      <div class="hero__bg" aria-hidden="true">
+        <div class="hero__glow"></div>
+        <div class="hero__tiles"></div>
+      </div>
+
+      <div class="hero__content">
+        <p class="eyebrow reveal"><span class="live-dot" id="heroLiveDot"></span><span id="heroStatus">Francisco Morato · SP</span></p>
+        <h1 class="hero__title">
+          <span class="neon" data-text="CAPITÃO">CAPITÃO</span>
+          <span class="hero__sub reveal">Barba <i>·</i> Cabelo <i>·</i> Bigode</span>
+        </h1>
+        <p class="hero__lead reveal">O corte de cabelo que você sempre sonhou. Cadeira confortável, café passado, papo reto e acabamento na navalha.</p>
+        <div class="hero__actions reveal">
+          <a href="#agendar" class="btn btn--sky magnetic">
+            <svg><use href="#i-scissors"/></svg> Agendar horário
+          </a>
+          <a href="#galeria" class="btn btn--ghost magnetic">Ver os cortes</a>
+        </div>
+        <ul class="hero__facts reveal">
+          <li><strong>Seg–Sáb</strong><span>9h às 20h</span></li>
+          <li><strong data-count="1852">0</strong><span>seguidores</span></li>
+          <li><strong>Kids</strong><span>cadeira-carrinho</span></li>
+        </ul>
+      </div>
+
+      <!-- Espelho de barbearia -->
+      <div class="hero__mirror-wrap" id="mirrorWrap">
+        <div class="pole pole--tall" aria-hidden="true"><span></span></div>
+        <figure class="mirror" id="mirror">
+          <div class="mirror__frame">
+            <div class="mirror__glass">
+              <img src="assets/img/post-02.jpg" alt="Criança sorrindo na cadeira-carrinho da Barbearia Capitão" id="mirrorImg" />
+              <div class="mirror__shine"></div>
+            </div>
+          </div>
+          <div class="mirror__bulbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </figure>
+        <div class="hero__badge" aria-hidden="true">
+          <svg class="badge-ring" viewBox="0 0 200 200">
+            <defs><path id="circ" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"/></defs>
+            <text><textPath href="#circ">DESDE SEMPRE NA RÉGUA • BARBEARIA CAPITÃO • </textPath></text>
+          </svg>
+          <svg class="badge-icon"><use href="#capitao"/></svg>
+        </div>
+      </div>
+
+      <a href="#casa" class="hero__scroll" aria-label="Rolar para baixo">
+        <span class="razor"></span>
+        <small>role</small>
+      </a>
+    </section>
+
+    <!-- ========== MARQUEE ========== -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track">
+        <span>Barba</span><svg><use href="#i-scissors"/></svg>
+        <span>Cabelo</span><svg><use href="#i-scissors"/></svg>
+        <span>Bigode</span><svg><use href="#i-scissors"/></svg>
+        <span>Degradê</span><svg><use href="#i-scissors"/></svg>
+        <span>Navalha</span><svg><use href="#i-scissors"/></svg>
+        <span>Kids</span><svg><use href="#i-scissors"/></svg>
+        <span>Barba</span><svg><use href="#i-scissors"/></svg>
+        <span>Cabelo</span><svg><use href="#i-scissors"/></svg>
+        <span>Bigode</span><svg><use href="#i-scissors"/></svg>
+        <span>Degradê</span><svg><use href="#i-scissors"/></svg>
+        <span>Navalha</span><svg><use href="#i-scissors"/></svg>
+        <span>Kids</span><svg><use href="#i-scissors"/></svg>
+      </div>
+    </div>
+
+    <!-- ========== A CASA ========== -->
+    <section class="section casa" id="casa">
+      <div class="container casa__grid">
+        <div class="casa__photos">
+          <figure class="polaroid polaroid--a tilt"><img src="assets/img/post-03.jpg" alt="Barbeiro e cliente fazendo joinha" loading="lazy" /><figcaption>Cliente satisfeito é regra</figcaption></figure>
+          <figure class="polaroid polaroid--b tilt"><img src="assets/img/post-09.jpg" alt="Criança na cadeira-carrinho" loading="lazy" /><figcaption>Kids no volante</figcaption></figure>
+          <figure class="polaroid polaroid--c tilt"><img src="assets/img/post-07.jpg" alt="Criança com café da casa" loading="lazy" /><figcaption>Cafezinho da casa</figcaption></figure>
+        </div>
+        <div class="casa__text">
+          <p class="eyebrow reveal">A casa</p>
+          <h2 class="title reveal cut">Aqui não é só corte.<br /><em>É ritual.</em></h2>
+          <p class="reveal">Parede de cimento queimado, azul-céu, madeira e aquele letreiro aceso. A Capitão é o ponto de encontro de Francisco Morato pra quem leva o visual a sério — do primeiro corte do moleque ao degradê do pai.</p>
+          <ul class="checks reveal">
+            <li><svg><use href="#i-check"/></svg> Acabamento na navalha com toalha quente</li>
+            <li><svg><use href="#i-check"/></svg> Cadeira-carrinho pra criançada</li>
+            <li><svg><use href="#i-check"/></svg> Café, papo e jogo passando</li>
+            <li><svg><use href="#i-check"/></svg> Agendamento online, sem fila</li>
+          </ul>
+          <div class="stats reveal">
+            <div><strong data-count="75" data-suffix="+">0</strong><span>posts de trabalho</span></div>
+            <div><strong data-count="6">0</strong><span>dias por semana</span></div>
+            <div><strong data-count="11" data-suffix="h">0</strong><span>abertos por dia</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== RITUAL (passos) ========== -->
+    <section class="section ritual">
+      <div class="container">
+        <p class="eyebrow reveal center">O ritual Capitão</p>
+        <h2 class="title reveal center cut">Do café à <em>navalha</em></h2>
+        <ol class="ritual__steps">
+          <li class="reveal"><span class="ritual__n">01</span><h3>Chegou, sentou</h3><p>Horário marcado, sem fila. Café passado na mão enquanto a gente conversa sobre o corte.</p></li>
+          <li class="reveal"><span class="ritual__n">02</span><h3>Visagismo</h3><p>Formato do rosto, tipo de fio, rotina. O corte é pensado pra você — não pra foto.</p></li>
+          <li class="reveal"><span class="ritual__n">03</span><h3>Máquina & tesoura</h3><p>Degradê no detalhe, volume no lugar. Barba com toalha quente e óleo.</p></li>
+          <li class="reveal"><span class="ritual__n">04</span><h3>Navalha final</h3><p>Contorno limpo, pós-barba e finalização. Sai pronto pra foto.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ========== SERVIÇOS ========== -->
+    <section class="section servicos" id="servicos">
+      <div class="container">
+        <div class="section__head">
+          <div>
+            <p class="eyebrow reveal">Tabela da casa</p>
+            <h2 class="title reveal cut">Serviços</h2>
+          </div>
+          <div class="tabs reveal" id="servTabs" role="tablist" aria-label="Filtrar serviços"></div>
+        </div>
+        <div class="menu" id="servList"></div>
+        <p class="note reveal">* Valores de exemplo (beta) — confirmar tabela oficial com a barbearia.</p>
+      </div>
+    </section>
+
+
+    <!-- ========== GALERIA INSTAGRAM ========== -->
+    <section class="section galeria" id="galeria">
+      <div class="container">
+        <div class="section__head">
+          <div>
+            <p class="eyebrow reveal">Direto do Instagram</p>
+            <h2 class="title reveal cut"><a href="https://www.instagram.com/capitao_bcb/" target="_blank" rel="noopener">@capitao_bcb</a></h2>
+          </div>
+          <a href="https://www.instagram.com/capitao_bcb/" target="_blank" rel="noopener" class="btn btn--ghost reveal"><svg><use href="#i-ig"/></svg> Seguir no Instagram</a>
+        </div>
+        <div class="ig-grid" id="igGrid"></div>
+      </div>
+    </section>
+
+    <!-- ========== AGENDAMENTO ========== -->
+    <section class="section agendar" id="agendar">
+      <div class="container agendar__grid">
+        <aside class="agendar__side">
+          <p class="eyebrow reveal">Reserva online</p>
+          <h2 class="title reveal cut">Garanta sua <em>cadeira</em></h2>
+          <p class="reveal">Escolha o serviço, o barbeiro e o horário. Em menos de um minuto sua cadeira está reservada.</p>
+          <div class="summary" id="summary" aria-live="polite">
+            <h3>Sua comanda</h3>
+            <ul id="sumList"><li class="muted">Nenhum serviço ainda</li></ul>
+            <dl>
+              <div><dt>Barbeiro</dt><dd id="sumBarber">—</dd></div>
+              <div><dt>Quando</dt><dd id="sumWhen">—</dd></div>
+              <div><dt>Duração</dt><dd id="sumDur">—</dd></div>
+            </dl>
+            <div class="summary__total"><span>Total</span><strong id="sumTotal">R$ 0</strong></div>
+          </div>
+        </aside>
+
+        <div class="wizard" id="wizard">
+          <ol class="wizard__steps" id="wizSteps">
+            <li class="is-active"><span>1</span>Serviço</li>
+            <li><span>2</span>Barbeiro</li>
+            <li><span>3</span>Horário</li>
+            <li><span>4</span>Seus dados</li>
+          </ol>
+
+          <!-- Passo 1 -->
+          <div class="wizard__panel is-active" data-step="1">
+            <h3>O que vamos fazer hoje?</h3>
+            <p class="muted">Pode escolher mais de um.</p>
+            <div class="pick-list" id="pickServ"></div>
+          </div>
+
+          <!-- Passo 2 -->
+          <div class="wizard__panel" data-step="2">
+            <h3>Quem vai te atender?</h3>
+            <div class="pick-barbers" id="pickBarber"></div>
+          </div>
+
+          <!-- Passo 3 -->
+          <div class="wizard__panel" data-step="3">
+            <h3>Escolha o dia e a hora</h3>
+            <div class="days" id="pickDay"></div>
+            <div class="slots" id="pickSlot"></div>
+          </div>
+
+          <!-- Passo 4 -->
+          <div class="wizard__panel" data-step="4">
+            <h3>Quase lá, capitão.</h3>
+            <form id="bookForm" class="form" novalidate>
+              <label>Nome
+                <input type="text" name="nome" autocomplete="name" required placeholder="Como te chamamos?" />
+              </label>
+              <label>WhatsApp
+                <input type="tel" name="telefone" autocomplete="tel" required placeholder="(11) 90000-0000" inputmode="tel" />
+              </label>
+              <label class="full">Observação <small>(opcional)</small>
+                <textarea name="obs" rows="2" placeholder="Ex.: quero manter o volume em cima"></textarea>
+              </label>
+              <p class="form__err" id="formErr" role="alert"></p>
+            </form>
+          </div>
+
+          <!-- Sucesso -->
+          <div class="wizard__panel wizard__done" data-step="5">
+            <div class="ticket" id="ticket"></div>
+            <div class="ticket__actions">
+              <a class="btn btn--sky" id="waConfirm" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg> Avisar no WhatsApp</a>
+              <button class="btn btn--ghost" id="icsBtn" type="button">Salvar na agenda</button>
+              <button class="btn btn--link" id="newBooking" type="button">Fazer outra reserva</button>
+            </div>
+          </div>
+
+          <div class="wizard__nav" id="wizNav">
+            <button class="btn btn--ghost" id="wizBack" type="button" disabled>Voltar</button>
+            <button class="btn btn--sky" id="wizNext" type="button" disabled>Continuar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== LOCAL ========== -->
+    <section class="section local" id="local">
+      <div class="container local__grid">
+        <div class="local__info">
+          <p class="eyebrow reveal">Onde estamos</p>
+          <h2 class="title reveal cut">Cola <em>aqui</em></h2>
+          <ul class="info-list reveal">
+            <li><svg><use href="#i-pin"/></svg><div><strong>R. João Mendes Júnior, 520</strong><span>Francisco Morato — SP</span></div></li>
+            <li><svg><use href="#i-clock"/></svg><div><strong>Segunda a sábado</strong><span>9h às 20h · Domingo fechado</span></div></li>
+            <li><svg><use href="#i-ig"/></svg><div><strong><a href="https://www.instagram.com/capitao_bcb/" target="_blank" rel="noopener">@capitao_bcb</a></strong><span>Feedbacks, novidades e cortes</span></div></li>
+          </ul>
+          <div class="open-now reveal" id="openNow"></div>
+          <div class="hours reveal" id="hoursTable"></div>
+        </div>
+        <div class="local__map reveal">
+          <iframe title="Mapa Barbearia Capitão" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps?q=R.+Jo%C3%A3o+Mendes+J%C3%BAnior,+520,+Francisco+Morato+-+SP&output=embed"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== CTA FINAL ========== -->
+    <section class="cta-final">
+      <div class="container">
+        <svg class="cta-final__icon"><use href="#capitao"/></svg>
+        <h2 class="title center">Bora ficar na <em>régua?</em></h2>
+        <a href="#agendar" class="btn btn--sky btn--lg magnetic">Agendar agora</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__grid">
+      <div class="footer__brand">
+        <img src="assets/img/logo.jpg" alt="Logo Barbearia Capitão" />
+        <p>Barba · Cabelo · Bigode<br />Francisco Morato — SP</p>
+      </div>
+      <div>
+        <h4>Navegue</h4>
+        <a href="#servicos">Serviços</a><a href="#galeria">Instagram</a><a href="#agendar">Agendar</a>
+      </div>
+      <div>
+        <h4>Contato</h4>
+        <a href="https://www.instagram.com/capitao_bcb/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://appbarber.com.br/download" target="_blank" rel="noopener">App AppBarber</a>
+        <a href="admin.html">Painel da barbearia</a>
+      </div>
+    </div>
+    <p class="footer__legal">© <span id="year"></span> Barbearia Capitão · <span class="beta-tag">beta 1.0</span></p>
+  </footer>
+
+  <!-- Botão flutuante -->
+  <a href="#agendar" class="fab" id="fab" aria-label="Agendar horário"><svg><use href="#i-scissors"/></svg><span>Agendar</span></a>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Post do Instagram" hidden>
+    <button class="lightbox__close" id="lbClose" aria-label="Fechar">×</button>
+    <button class="lightbox__nav lightbox__nav--prev" id="lbPrev" aria-label="Anterior">‹</button>
+    <figure>
+      <img id="lbImg" alt="" />
+      <figcaption><span id="lbCap"></span><a id="lbLink" target="_blank" rel="noopener"><svg><use href="#i-ig"/></svg> Ver no Instagram</a></figcaption>
+    </figure>
+    <button class="lightbox__nav lightbox__nav--next" id="lbNext" aria-label="Próximo">›</button>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/booking.js"></script>
+</body>
+</html>
