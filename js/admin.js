@@ -124,12 +124,16 @@
   $('#nextDay').onclick = () => setDia(DB.addDias(dia, 1));
   $('#todayBtn').onclick = () => setDia(hoje());
   $('#datePick').onchange = (e) => { if (e.target.value) setDia(e.target.value); };
-  $('#blockMode').onclick = () => {
-    blockMode = !blockMode;
-    $('#blockMode').setAttribute('aria-pressed', blockMode);
-    $('#agenda').classList.toggle('block-mode', blockMode);
-    toast(blockMode ? 'Modo bloqueio: clique nos horários pra bloquear/liberar' : 'Modo bloqueio desligado');
-  };
+  function setBlockMode(on) {
+    blockMode = on;
+    $('#blockMode').setAttribute('aria-pressed', on);
+    $('#blockMode').lastChild.textContent = on ? ' Concluir bloqueio' : ' Bloquear horários';
+    $('#agenda').classList.toggle('block-mode', on);
+    $('#blockHint').hidden = !on;
+    if (on) $$('.side__nav button').find(b => b.dataset.view === 'agenda' && !b.classList.contains('is-active'))?.click();
+  }
+  $('#blockMode').onclick = () => setBlockMode(!blockMode);
+  $('#blockDone').onclick = () => setBlockMode(false);
   addEventListener('keydown', (e) => {
     if ($('#app').hidden || e.target.closest('input, select, textarea, dialog')) return;
     if (e.key === 'ArrowLeft') setDia(DB.addDias(dia, -1));
@@ -178,7 +182,7 @@
     $('#kpis').innerHTML = `
       <div class="kpi"><small>Reservas</small><strong>${doDia.length}</strong><span>${conc.length} concluídas · ${faltas} faltas</span></div>
       <div class="kpi"><small>Faturamento previsto</small><strong>${brl(fat)}</strong><span>${brl(conc.reduce((a, r) => a + r.total, 0))} já realizado</span></div>
-      <div class="kpi"><small>Ocupação</small><strong>${ocup}%</strong><span>${hrs ? `${Math.max(0, cap - usados)} horários livres` : 'Fechado'}</span></div>
+      <div class="kpi"><small>Ocupação</small><strong>${ocup}%</strong><span>${hrs ? `${Math.max(0, cap - usados - cache.bloqueios.filter(b => b.data === dia).length)} horários livres` : 'Fechado'}</span></div>
       <div class="kpi kpi--hot"><small>Próximo cliente</small><strong>${prox ? esc(prox.cliente.nome) : '—'}</strong><span>${proxTxt}${prox ? ' · ' + esc(nomeB(prox.barbeiroId)) : ''}</span></div>`;
   }
 
@@ -201,7 +205,7 @@
     let html = `<div class="agenda__head" style="justify-content:center">⏱</div>`;
     C.barbeiros.forEach(b => {
       const n = ativas().filter(r => r.data === dia && r.barbeiroId === b.id).length;
-      html += `<div class="agenda__head"><span class="av"><svg><use href="#capitao"/></svg></span><div>${esc(b.nome)}<small>${n} ${n === 1 ? 'cliente' : 'clientes'}</small></div></div>`;
+      html += `<div class="agenda__head" data-b="${b.id}"><span class="av"><svg><use href="#capitao"/></svg></span><div>${esc(b.nome)}<small>${n} ${n === 1 ? 'cliente' : 'clientes'}</small></div></div>`;
     });
     html += `<div class="agenda__times">`;
     for (let i = 0; i < rows; i++) html += `<div class="agenda__time">${i === 0 ? '' : DB.toHHMM(abre + i * step)}</div>`;
@@ -239,16 +243,53 @@
   }
 
   $('#agenda').addEventListener('click', async (e) => {
+    const head = e.target.closest('.agenda__head[data-b]');
+    if (head && blockMode) return alternarDia(head.dataset.b);
     const ap = e.target.closest('.appt');
     if (ap) return openDrawer(ap.dataset.id);
     const cell = e.target.closest('.cell'); if (!cell) return;
     const b = cell.closest('.agenda__col').dataset.b, h = cell.dataset.h;
     if (blockMode || cell.dataset.bloq) {
-      try { await S.alternarBloqueio(b, dia, h, cell.dataset.bloq || null); await refresh(); } catch (ex) { erro(ex); }
+      const liberar = !!cell.dataset.bloq;
+      if (!blockMode && !confirm(`Liberar ${h} de ${nomeB(b)}? O horário volta a aparecer no site.`)) return;
+      cell.disabled = true;
+      try {
+        await S.alternarBloqueio(b, dia, h, cell.dataset.bloq || null);
+        await refresh();
+        toast(liberar ? `${h} liberado — volta a aparecer no site` : `🔒 ${h} bloqueado — cliente não consegue reservar`);
+      } catch (ex) { erro(ex); cell.disabled = false; }
       return;
     }
     openNew({ barbeiro: b, data: dia, hora: h });
   });
+
+  /** Bloqueia todos os horários livres do barbeiro no dia; se já estiver tudo bloqueado, libera. */
+  async function alternarDia(barbeiroId) {
+    const hrs = C.horarios[DB.parseYmd(dia).getDay()]; if (!hrs) return;
+    const [abre, fecha] = hrs.map(DB.toMin);
+    const bloqueados = cache.bloqueios.filter(x => x.barbeiroId === barbeiroId && x.data === dia);
+    const comReserva = DB.ocupados(ativas(), barbeiroId, dia);
+    const jaBloq = new Set(bloqueados.map(x => x.hora));
+    const livres = [];
+    for (let m = abre; m < fecha; m += C.slotMin) {
+      const h = DB.toHHMM(m);
+      if (!jaBloq.has(h) && !comReserva.has(m)) livres.push(h);
+    }
+    try {
+      if (livres.length) {
+        const aviso = comReserva.size ? '\nAs reservas já marcadas continuam valendo.' : '';
+        if (!confirm(`Bloquear o dia todo de ${nomeB(barbeiroId)} (${livres.length} horários livres)?${aviso}`)) return;
+        await S.bloquearVarios(livres.map(hora => ({ barbeiroId, data: dia, hora })));
+        await refresh();
+        toast(`🔒 Dia de ${nomeB(barbeiroId)} bloqueado`);
+      } else if (bloqueados.length) {
+        if (!confirm(`Liberar os ${bloqueados.length} horários bloqueados de ${nomeB(barbeiroId)} nesse dia?`)) return;
+        await S.liberarVarios(bloqueados.map(x => x.id));
+        await refresh();
+        toast(`Dia de ${nomeB(barbeiroId)} liberado`);
+      }
+    } catch (ex) { erro(ex); }
+  }
 
   /* ---------- Lista ---------- */
   function renderLista() {

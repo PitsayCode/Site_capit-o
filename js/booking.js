@@ -308,6 +308,9 @@
     },
   };
 
+  // cliente voltou pra aba: busca a agenda de novo (pode ter mudado no painel)
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && st.step === 3) atualizarAgenda(); });
+
   // modo local: atualiza horários se o painel mexer na agenda em outra aba
   if (S.mode === 'local') S.aoMudar(() => { if (st.step === 3) atualizarAgenda(); });
 

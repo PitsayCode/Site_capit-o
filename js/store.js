@@ -122,6 +122,18 @@ window.CapitaoStore = (() => {
         if (error) fail(error);
       },
 
+      async bloquearVarios(lista) {
+        if (!lista.length) return;
+        const { error } = await sb.from('bloqueios').insert(lista.map(x => ({ barbeiro_id: x.barbeiroId, data: x.data, hora: x.hora })));
+        if (error) fail(error);
+      },
+
+      async liberarVarios(ids) {
+        if (!ids.length) return;
+        const { error } = await sb.from('bloqueios').delete().in('id', ids);
+        if (error) fail(error);
+      },
+
       /** Avisa quando qualquer reserva/bloqueio muda (Realtime). Retorna função pra cancelar. */
       aoMudar(cb) {
         const ch = sb.channel('agenda')
@@ -198,6 +210,8 @@ window.CapitaoStore = (() => {
         else db.bloqueios.push({ id: uid(), barbeiroId, data, hora });
         save(db);
       },
+      async bloquearVarios(lista) { const db = load(); lista.forEach(x => db.bloqueios.push({ id: uid(), ...x })); save(db); },
+      async liberarVarios(ids) { const db = load(); db.bloqueios = db.bloqueios.filter(b => !ids.includes(b.id)); save(db); },
       aoMudar(cb) {
         const h = (e) => { if (e.key === KEY) cb('sync', null); };
         addEventListener('storage', h);

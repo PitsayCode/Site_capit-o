@@ -80,6 +80,17 @@ body.admin .grain { display: none; }
 .icon-btn:hover { border-color: var(--sky); color: var(--sky); }
 .topbar__actions { display: flex; gap: 10px; flex-wrap: wrap; }
 #blockMode[aria-pressed="true"] { background: var(--danger); border-color: var(--danger); color: #fff; }
+.block-hint {
+  display: flex; align-items: center; gap: 14px; margin: -6px 0 18px; padding: 14px 16px; border-radius: 14px;
+  background: rgba(226, 87, 76, .1); border: 1px solid rgba(226, 87, 76, .45); animation: fade .3s;
+}
+.block-hint[hidden] { display: none; }
+.block-hint > svg { width: 22px; height: 22px; color: var(--danger); flex: none; }
+.block-hint p { margin: 0; font-size: 14px; color: var(--bone-2); flex: 1; }
+.block-hint strong { color: #f0a39c; }
+.block-mode .agenda__head[data-b] { cursor: pointer; }
+.block-mode .agenda__head[data-b]:hover { background: rgba(226, 87, 76, .18); }
+.block-mode .agenda__head[data-b]::after { content: '🔒 dia todo'; margin-left: auto; font: 500 10px var(--f-label); letter-spacing: .12em; color: #f0a39c; }
 
 /* ---------- KPIs ---------- */
 .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
