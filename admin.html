@@ -36,16 +36,20 @@
     <form class="login__card" id="loginForm">
       <img src="assets/img/logo.jpg" alt="Logo Barbearia Capitão" />
       <h1>Painel da Casa</h1>
-      <p class="muted">Digite o PIN pra acessar a agenda.</p>
-      <div class="pin" id="pinBoxes">
+      <p class="muted" id="loginMsg">Entre pra acessar a agenda.</p>
+      <div class="login__fields" id="emailFields" hidden>
+        <label>E-mail <input type="email" id="loginEmail" autocomplete="username" required /></label>
+        <label>Senha <input type="password" id="loginPass" autocomplete="current-password" required /></label>
+      </div>
+      <div class="pin" id="pinBoxes" hidden>
         <input inputmode="numeric" maxlength="1" aria-label="Dígito 1" autocomplete="off" />
         <input inputmode="numeric" maxlength="1" aria-label="Dígito 2" autocomplete="off" />
         <input inputmode="numeric" maxlength="1" aria-label="Dígito 3" autocomplete="off" />
         <input inputmode="numeric" maxlength="1" aria-label="Dígito 4" autocomplete="off" />
       </div>
       <p class="login__err" id="loginErr" role="alert"></p>
-      <button class="btn btn--sky" type="submit">Entrar</button>
-      <p class="login__hint"><span class="beta-tag">beta</span> PIN de teste: <b>1234</b> — proteção real entra na versão com servidor.</p>
+      <button class="btn btn--sky" type="submit" id="loginBtn">Entrar</button>
+      <p class="login__hint" id="loginHint"></p>
       <a href="index.html" class="btn btn--link">← Voltar ao site</a>
     </form>
   </section>
@@ -55,7 +59,7 @@
     <aside class="side">
       <a href="index.html" class="side__brand" title="Ver site">
         <img src="assets/img/logo.jpg" alt="" />
-        <span>Capitão<small>Painel · beta 1.0</small></span>
+        <span>Capitão<small id="modeTag">Painel · v1.1</small></span>
       </a>
       <nav class="side__nav">
         <button class="is-active" data-view="agenda"><span aria-hidden="true">▦</span>Agenda do dia</button>
@@ -145,7 +149,10 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
   <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/admin.js"></script>
 </body>
 </html>

@@ -1,9 +1,9 @@
 /* =========================================================
-   BARBEARIA CAPITÃO — Reserva online (beta 1.0)
-   Salva em localStorage via CapitaoDB (ver js/data.js).
+   BARBEARIA CAPITÃO — Reserva online (v1.1)
+   Grava via CapitaoStore (Supabase, ou localStorage em modo local).
    ========================================================= */
 (() => {
-  const C = window.CAPITAO, DB = window.CapitaoDB;
+  const C = window.CAPITAO, DB = window.CapitaoDB, S = window.CapitaoStore;
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const DIAS_C = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -21,12 +21,19 @@
   const fmtData = (ymd) => { const d = DB.parseYmd(ymd); return `${DIAS_C[d.getDay()]}, ${d.getDate()} ${MESES_C[d.getMonth()]}`; };
   const fmtDur = (m) => m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? String(m % 60).padStart(2, '0') : ''}` : `${m} min`;
 
+  /* Ocupação (sem dados pessoais) dos próximos dias, buscada do servidor */
+  let ocupacao = [];
+  async function carregarOcupacao() {
+    const hoje = DB.ymd(new Date());
+    ocupacao = await S.ocupacao(hoje, DB.addDias(hoje, C.diasAFrente));
+  }
+
   /** Horários livres considerando "sem preferência" (união de todos) */
   function slotsDoDia(data) {
-    const db = DB.load(), dur = duracao();
-    if (st.barbeiro && st.barbeiro !== 'any') return DB.livres(db, st.barbeiro, data, dur);
+    const dur = duracao();
+    if (st.barbeiro && st.barbeiro !== 'any') return DB.livres(ocupacao, st.barbeiro, data, dur);
     const set = new Set();
-    C.barbeiros.forEach(b => DB.livres(db, b.id, data, dur).forEach(h => set.add(h)));
+    C.barbeiros.forEach(b => DB.livres(ocupacao, b.id, data, dur).forEach(h => set.add(h)));
     return [...set].sort();
   }
 
@@ -96,6 +103,18 @@
         hs.map(h => `<button type="button" class="slot" data-h="${h}" aria-pressed="${st.hora === h}">${h}</button>`).join('');
     }).join('');
   }
+  async function atualizarAgenda() {
+    pickDay.innerHTML = '';
+    pickSlot.innerHTML = '<p class="slots__empty">Consultando a agenda…</p>';
+    try {
+      await carregarOcupacao();
+      renderDays();
+    } catch (ex) {
+      pickSlot.innerHTML = `<p class="slots__empty">Não consegui carregar a agenda. <button type="button" class="btn btn--link" data-retry>Tentar de novo</button></p>`;
+    }
+  }
+  pickSlot.addEventListener('click', (e) => { if (e.target.closest('[data-retry]')) atualizarAgenda(); });
+
   pickDay.addEventListener('click', (e) => {
     const b = e.target.closest('.day'); if (!b || b.disabled) return;
     st.data = b.dataset.d; st.hora = null;
@@ -140,7 +159,7 @@
     panels.forEach(p => p.classList.toggle('is-active', +p.dataset.step === n));
     steps.forEach((li, i) => { li.classList.toggle('is-active', i + 1 === n); li.classList.toggle('is-done', i + 1 < n || n === 5); });
     $('#wizNav').classList.toggle('is-hidden', n === 5);
-    if (n === 3) renderDays();
+    if (n === 3) atualizarAgenda();
     if (n === 4) setTimeout(() => form.nome.focus({ preventScroll: true }), 300);
     update();
     const w = $('#wizard').getBoundingClientRect();
@@ -168,21 +187,25 @@
     $('#sumTotal').textContent = brl(total());
   }
 
-  function confirmar() {
+  let enviando = false;
+  async function confirmar() {
+    if (enviando) return;
     const err = validar();
     $('#formErr').textContent = err;
     if (err) return;
     const dur = duracao();
-    let barbeiroId = st.barbeiro;
-    if (barbeiroId === 'any') {
-      const db = DB.load();
-      const livre = C.barbeiros.find(b => DB.livres(db, b.id, st.data, dur).includes(st.hora));
-      if (!livre) { $('#formErr').textContent = 'Esse horário acabou de ser ocupado. Escolha outro.'; return; }
-      barbeiroId = livre.id;
-    }
     const cliente = { nome: form.nome.value.trim(), telefone: form.telefone.value.trim() };
+    enviando = true;
+    next.disabled = true; next.textContent = 'Reservando…';
     try {
-      const r = DB.criar({
+      await carregarOcupacao(); // dados frescos pra escolher o barbeiro livre
+      let barbeiroId = st.barbeiro;
+      if (barbeiroId === 'any') {
+        const livre = C.barbeiros.find(b => DB.livres(ocupacao, b.id, st.data, dur).includes(st.hora));
+        if (!livre) throw new S.StoreError('Esse horário acabou de ser ocupado. Escolha outro.');
+        barbeiroId = livre.id;
+      }
+      const r = await S.criarReserva({
         servicos: servSel().map(s => ({ id: s.id, nome: s.nome, preco: s.preco })),
         barbeiroId, data: st.data, hora: st.hora, duracao: dur, total: total(),
         cliente, obs: form.obs.value.trim(),
@@ -194,7 +217,11 @@
       window.Sound?.ding();
       confete();
     } catch (ex) {
-      $('#formErr').textContent = ex.message;
+      $('#formErr').textContent = ex instanceof S.StoreError ? ex.message : 'Falha de conexão. Tente de novo.';
+      if (/ocupado/.test(ex.message)) { st.hora = null; setTimeout(() => go(3), 1400); }
+    } finally {
+      enviando = false;
+      update();
     }
   }
 
@@ -213,10 +240,10 @@
         <div><dt>Duração</dt><dd>${fmtDur(r.duracao)}</dd></div>
         <div><dt>Total</dt><dd>${brl(r.total)}</dd></div>
       </dl>
-      <div class="ticket__code"><span>Código</span><b>${r.id.slice(-6)}</b></div>`;
+      <div class="ticket__code"><span>Código</span><b>${esc(r.codigo)}</b></div>`;
     const msg = `Olá, Capitão! Acabei de reservar pelo site:\n\n` +
       `• ${r.servicos.map(s => s.nome).join(' + ')}\n• ${fmtData(r.data)} às ${r.hora}\n• Barbeiro: ${nomeBarbeiro(r.barbeiroId)}\n` +
-      `• Nome: ${r.cliente.nome}\n• Código: ${r.id.slice(-6)}`;
+      `• Nome: ${r.cliente.nome}\n• Código: ${r.codigo}`;
     $('#waConfirm').href = `https://wa.me/${C.whatsapp}?text=${encodeURIComponent(msg)}`;
   }
 
@@ -228,7 +255,7 @@
     const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Barbearia Capitao//PT-BR', 'BEGIN:VEVENT',
       `UID:${r.id}@capitao`, `DTSTAMP:${f(new Date())}`, `DTSTART:${f(ini)}`, `DTEND:${f(fim)}`,
       `SUMMARY:Barbearia Capitão — ${r.servicos.map(s => s.nome).join(' + ')}`,
-      `LOCATION:${C.endereco}\\, ${C.cidade}`, `DESCRIPTION:Código ${r.id.slice(-6)}`,
+      `LOCATION:${C.endereco}\\, ${C.cidade}`, `DESCRIPTION:Código ${r.codigo}`,
       'BEGIN:VALARM', 'TRIGGER:-PT1H', 'ACTION:DISPLAY', 'DESCRIPTION:Corte na Capitão em 1h', 'END:VALARM',
       'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
     const a = document.createElement('a');
@@ -281,8 +308,8 @@
     },
   };
 
-  // atualiza horários se o painel mexer na agenda em outra aba
-  addEventListener('storage', (e) => { if (e.key === DB.KEY && st.step === 3) renderDays(); });
+  // modo local: atualiza horários se o painel mexer na agenda em outra aba
+  if (S.mode === 'local') S.aoMudar(() => { if (st.step === 3) atualizarAgenda(); });
 
   update();
 })();

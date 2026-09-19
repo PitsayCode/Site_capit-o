@@ -1,5 +1,5 @@
 /* =========================================================
-   BARBEARIA CAPITÃO — Configuração central (beta 1.0)
+   BARBEARIA CAPITÃO — Configuração central (v1.1)
    Tudo que o cliente pode querer trocar fica aqui.
    ⚠ Valores marcados com [PLACEHOLDER] precisam ser confirmados.
    ========================================================= */
@@ -77,55 +77,36 @@ window.CAPITAO = {
   ],
 };
 
-/* ---------- Banco local (beta: localStorage) ---------- */
+/* ---------- Utilitários de agenda (puros, sem banco) ----------
+   "ocupacao" = lista de { barbeiroId, data:'YYYY-MM-DD', hora:'HH:MM', duracao }
+   vinda do CapitaoStore (Supabase ou local). */
 window.CapitaoDB = (() => {
-  const KEY = 'capitao_db_v1';
-  const empty = () => ({ reservas: [], bloqueios: [] });
-
-  function load() {
-    try {
-      const raw = localStorage.getItem(KEY);
-      return raw ? Object.assign(empty(), JSON.parse(raw)) : empty();
-    } catch { return empty(); }
-  }
-  function save(db) {
-    try { localStorage.setItem(KEY, JSON.stringify(db)); } catch {}
-  }
-  const uid = () => 'R' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase();
-
   const toMin = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
   const toHHMM = (min) => String(Math.floor(min / 60)).padStart(2, '0') + ':' + String(min % 60).padStart(2, '0');
   const ymd = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   const parseYmd = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+  const addDias = (s, n) => { const d = parseYmd(s); d.setDate(d.getDate() + n); return ymd(d); };
 
-  const ativas = (db) => db.reservas.filter(r => r.status !== 'cancelado');
-
-  /** Minutos ocupados de um barbeiro num dia -> Set de minutos de início de slot */
-  function ocupados(db, barbeiroId, data) {
-    const step = CAPITAO.slotMin;
-    const set = new Set();
-    ativas(db).filter(r => r.barbeiroId === barbeiroId && r.data === data).forEach(r => {
-      const ini = toMin(r.hora);
-      for (let m = ini; m < ini + r.duracao; m += step) set.add(m);
+  /** Set com o início (em minutos) de cada slot ocupado de um barbeiro num dia */
+  function ocupados(ocupacao, barbeiroId, data) {
+    const step = CAPITAO.slotMin, set = new Set();
+    ocupacao.filter(o => o.barbeiroId === barbeiroId && o.data === data).forEach(o => {
+      const ini = toMin(o.hora);
+      for (let m = ini - (ini % step); m < ini + o.duracao; m += step) set.add(m);
     });
-    db.bloqueios.filter(b => b.barbeiroId === barbeiroId && b.data === data).forEach(b => set.add(toMin(b.hora)));
     return set;
   }
 
-  /** Horários livres para uma duração num dia (considera expediente, ocupação e horário atual) */
-  function livres(db, barbeiroId, data, duracao) {
-    const dia = parseYmd(data);
-    const exp = CAPITAO.horarios[dia.getDay()];
+  /** Horários livres para uma duração. `respeitarAgora` esconde horários que já passaram (site). */
+  function livres(ocupacao, barbeiroId, data, duracao, respeitarAgora = true) {
+    const exp = CAPITAO.horarios[parseYmd(data).getDay()];
     if (!exp) return [];
-    const step = CAPITAO.slotMin;
-    const [abre, fecha] = exp.map(toMin);
-    const occ = ocupados(db, barbeiroId, data);
-    const now = new Date();
-    const isToday = ymd(now) === data;
-    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const step = CAPITAO.slotMin, [abre, fecha] = exp.map(toMin);
+    const occ = ocupados(ocupacao, barbeiroId, data);
+    const now = new Date(), isToday = ymd(now) === data, nowMin = now.getHours() * 60 + now.getMinutes();
     const out = [];
     for (let m = abre; m + duracao <= fecha; m += step) {
-      if (isToday && m <= nowMin + 15) continue;
+      if (respeitarAgora && isToday && m <= nowMin + 15) continue;
       let ok = true;
       for (let k = m; k < m + duracao; k += step) if (occ.has(k)) { ok = false; break; }
       if (ok) out.push(toHHMM(m));
@@ -133,41 +114,7 @@ window.CapitaoDB = (() => {
     return out;
   }
 
-  function criar(dados) {
-    const db = load();
-    const dur = dados.duracao;
-    if (!livres(db, dados.barbeiroId, dados.data, dur).includes(dados.hora) && !dados.forcar) {
-      throw new Error('Esse horário acabou de ser ocupado. Escolha outro.');
-    }
-    const r = Object.assign({ id: uid(), status: 'confirmado', criadoEm: new Date().toISOString(), origem: 'site' }, dados);
-    delete r.forcar;
-    db.reservas.push(r);
-    save(db);
-    return r;
-  }
-
-  function atualizar(id, patch) {
-    const db = load();
-    const r = db.reservas.find(x => x.id === id);
-    if (r) Object.assign(r, patch);
-    save(db);
-    return r;
-  }
-
-  function remover(id) {
-    const db = load();
-    db.reservas = db.reservas.filter(x => x.id !== id);
-    save(db);
-  }
-
-  function alternarBloqueio(barbeiroId, data, hora) {
-    const db = load();
-    const i = db.bloqueios.findIndex(b => b.barbeiroId === barbeiroId && b.data === data && b.hora === hora);
-    if (i >= 0) db.bloqueios.splice(i, 1); else db.bloqueios.push({ barbeiroId, data, hora });
-    save(db);
-  }
-
-  return { KEY, load, save, uid, livres, ocupados, criar, atualizar, remover, alternarBloqueio, toMin, toHHMM, ymd, parseYmd };
+  return { toMin, toHHMM, ymd, parseYmd, addDias, ocupados, livres };
 })();
 
 window.brl = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 2 });

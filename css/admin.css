@@ -30,6 +30,14 @@ body.admin .grain { display: none; }
 .pin input:focus { outline: none; border-color: var(--sky); transform: translateY(-2px); }
 .pin.is-shake { animation: shake .4s; }
 @keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+.login__fields { width: 100%; display: grid; gap: 12px; margin: 14px 0 2px; text-align: left; }
+.login__fields[hidden], .pin[hidden] { display: none; }
+.login__fields label { display: grid; gap: 6px; font: 500 12px var(--f-label); letter-spacing: .16em; text-transform: uppercase; color: var(--bone-2); }
+.login__fields input {
+  font: 400 16px var(--f-body); color: var(--bone); background: var(--ink-2); border: 1px solid var(--line);
+  border-radius: 12px; padding: 13px 14px; letter-spacing: 0; text-transform: none;
+}
+.login__fields input:focus { outline: none; border-color: var(--sky); box-shadow: 0 0 0 4px rgba(46, 163, 220, .15); }
 .login__err { color: var(--danger); min-height: 1.3em; font-size: 14px; }
 .login__card .btn--sky { width: 100%; }
 .login__hint { font-size: 13px; color: var(--muted); margin-top: 10px !important; }
@@ -170,6 +178,7 @@ body.admin .grain { display: none; }
 .pill--concluido { background: rgba(60, 207, 142, .15); color: var(--ok); }
 .pill--falta { background: rgba(226, 87, 76, .15); color: #f0a39c; }
 .pill--cancelado { background: rgba(141, 145, 153, .15); color: var(--muted); text-decoration: line-through; }
+.loading { opacity: .55; pointer-events: none; transition: opacity .2s; }
 .empty { padding: 50px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 16px; }
 
 /* ---------- Drawer ---------- */
