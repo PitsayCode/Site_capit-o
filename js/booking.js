@@ -314,5 +314,7 @@
   // modo local: atualiza horários se o painel mexer na agenda em outra aba
   if (S.mode === 'local') S.aoMudar(() => { if (st.step === 3) atualizarAgenda(); });
 
+  if (S.demo && S.onlineDisponivel) $('#demoNote').hidden = false;
+
   update();
 })();

@@ -30,6 +30,22 @@ body.admin .grain { display: none; }
 .pin input:focus { outline: none; border-color: var(--sky); transform: translateY(-2px); }
 .pin.is-shake { animation: shake .4s; }
 @keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+.login__card > .btn--link { margin-top: 6px; }
+.login__demo, .login__real { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.login__real[hidden] { display: none; }
+.login__demo { padding: 20px 18px; margin-top: 10px; border-radius: 18px; border: 1px solid rgba(46, 163, 220, .45); background: rgba(46, 163, 220, .08); }
+.login__demo p { margin: 0; font-size: 14px; color: var(--bone-2); }
+.login__badge { font: 600 11px var(--f-label); letter-spacing: .2em; text-transform: uppercase; color: var(--ink); background: var(--sky); padding: 5px 10px; border-radius: 999px; }
+.login__code { font: 500 15px var(--f-label) !important; letter-spacing: .1em; text-transform: uppercase; color: var(--bone) !important; margin-top: 4px !important; }
+.login__code b { font: 400 26px var(--f-display); letter-spacing: .2em; color: var(--sky); vertical-align: middle; margin-left: 6px; }
+.login__demo .btn--sky, .login__real .btn { width: 100%; }
+.login__or { width: 100%; display: flex; align-items: center; gap: 12px; margin: 14px 0 0 !important; color: var(--muted); font: 500 11px var(--f-label); letter-spacing: .18em; text-transform: uppercase; }
+.login__or::before, .login__or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.demo-bar { margin: -6px 0 18px; padding: 12px 16px; border-radius: 14px; background: rgba(46, 163, 220, .1); border: 1px solid rgba(46, 163, 220, .4); }
+.demo-bar[hidden] { display: none; }
+.demo-bar p { margin: 0; font-size: 14px; color: var(--bone-2); }
+.demo-bar strong { color: var(--sky-2); }
+.demo-bar a { color: var(--sky); text-decoration: underline; }
 .login__fields { width: 100%; display: grid; gap: 12px; margin: 14px 0 2px; text-align: left; }
 .login__fields[hidden], .pin[hidden] { display: none; }
 .login__fields label { display: grid; gap: 6px; font: 500 12px var(--f-label); letter-spacing: .16em; text-transform: uppercase; color: var(--bone-2); }

@@ -10,7 +10,12 @@
    ========================================================= */
 window.CapitaoStore = (() => {
   const cfg = window.CAPITAO_SUPABASE || {};
-  const useSupabase = !!(cfg.url && cfg.anonKey && window.supabase?.createClient);
+  const DEMO_KEY = 'capitao_demo';
+  let demo = false;
+  try { demo = localStorage.getItem(DEMO_KEY) === '1'; } catch {}
+  const onlineDisponivel = !!(cfg.url && cfg.anonKey && window.supabase?.createClient);
+  // Modo demonstração (código 1234): site + painel usam dados locais só neste aparelho
+  const useSupabase = onlineDisponivel && !demo;
 
   class StoreError extends Error {}
 
@@ -222,6 +227,14 @@ window.CapitaoStore = (() => {
 
   const api = useSupabase ? supabaseBackend() : localBackend();
   api.StoreError = StoreError;
+  api.demo = demo || !onlineDisponivel;
+  api.onlineDisponivel = onlineDisponivel;
+  api.entrarDemo = () => {
+    try { localStorage.setItem(DEMO_KEY, '1'); sessionStorage.setItem('capitao_admin', '1'); } catch {}
+  };
+  api.sairDemo = () => {
+    try { localStorage.removeItem(DEMO_KEY); localStorage.removeItem('capitao_db_v1'); sessionStorage.removeItem('capitao_admin'); } catch {}
+  };
   if (!useSupabase) console.info('[Capitão] Modo local (sem Supabase). Configure js/config.js para usar o banco online.');
   return api;
 })();

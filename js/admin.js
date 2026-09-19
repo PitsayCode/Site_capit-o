@@ -1,8 +1,8 @@
 /* =========================================================
-   BARBEARIA CAPITÃO — Painel de reservas (v1.1)
+   BARBEARIA CAPITÃO — Painel de reservas (v1.3)
    Dados via CapitaoStore:
      • Supabase: login por e-mail/senha (Auth) + permissões RLS + tempo real
-     • Local: PIN de teste 1234 (só desenvolvimento)
+     • Demonstração: código 1234 -> dados fictícios só no aparelho (localStorage)
    ========================================================= */
 (() => {
   const C = window.CAPITAO, DB = window.CapitaoDB, S = window.CapitaoStore;
@@ -27,39 +27,49 @@
 
   /* ---------- Login ---------- */
   const boxes = $$('#pinBoxes input');
-  $('#modeTag').textContent = ONLINE ? 'Painel · online' : 'Painel · modo local';
-  if (ONLINE) {
-    $('#emailFields').hidden = false;
-    $('#loginHint').innerHTML = 'Acesso só para e-mails autorizados pela barbearia.';
-  } else {
-    $('#pinBoxes').hidden = false;
-    $$('#emailFields input').forEach(i => { i.disabled = true; }); // não bloqueiam o submit
-    $('#loginMsg').textContent = 'Digite o PIN pra acessar a agenda.';
-    $('#loginHint').innerHTML = '<span class="beta-tag">local</span> Sem Supabase configurado — PIN de teste: <b>1234</b>.';
-    boxes.forEach((inp, i) => {
-      inp.addEventListener('input', () => {
-        inp.value = inp.value.replace(/\D/g, '');
-        if (inp.value && i < boxes.length - 1) boxes[i + 1].focus();
-        if (boxes.every(b => b.value)) $('#loginForm').requestSubmit();
-      });
-      inp.addEventListener('keydown', (e) => { if (e.key === 'Backspace' && !inp.value && i > 0) boxes[i - 1].focus(); });
-    });
-  }
+  $('#modeTag').textContent = ONLINE ? 'Painel · online' : 'Painel · demonstração';
+  $('#loginForm').hidden = !S.onlineDisponivel;
 
+  boxes.forEach((inp, i) => {
+    inp.addEventListener('input', () => {
+      inp.value = inp.value.replace(/\D/g, '');
+      if (inp.value && i < boxes.length - 1) boxes[i + 1].focus();
+      if (boxes.every(b => b.value)) $('#demoForm').requestSubmit();
+    });
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Backspace' && !inp.value && i > 0) boxes[i - 1].focus(); });
+    inp.addEventListener('paste', (e) => {
+      const v = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 4);
+      if (!v) return; e.preventDefault();
+      v.split('').forEach((c, k) => boxes[k] && (boxes[k].value = c));
+      if (v.length === 4) $('#demoForm').requestSubmit();
+    });
+  });
+
+  // Demonstração: código 1234 -> dados fictícios locais (site + painel neste aparelho)
+  $('#demoForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (boxes.map(b => b.value).join('') !== '1234') {
+      $('#demoErr').textContent = 'Código incorreto. Use 1234.';
+      $('#pinBoxes').classList.remove('is-shake'); void $('#pinBoxes').offsetWidth; $('#pinBoxes').classList.add('is-shake');
+      boxes.forEach(b => b.value = ''); boxes[0].focus();
+      return;
+    }
+    S.entrarDemo();
+    if (ONLINE) { location.reload(); return; } // recarrega já no modo demonstração
+    entrar();
+  });
+
+  // Acesso real da barbearia (Supabase Auth)
   $('#loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = $('#loginBtn');
     btn.disabled = true; btn.textContent = 'Entrando…'; $('#loginErr').textContent = '';
     try {
-      if (ONLINE) await S.auth.entrar($('#loginEmail').value.trim(), $('#loginPass').value);
-      else await S.auth.entrar(null, boxes.map(b => b.value).join(''));
+      if (!ONLINE) { S.sairDemo(); location.reload(); return; }
+      await S.auth.entrar($('#loginEmail').value.trim(), $('#loginPass').value);
       entrar();
     } catch (ex) {
       $('#loginErr').textContent = ex instanceof S.StoreError ? ex.message : 'Falha de conexão.';
-      if (!ONLINE) {
-        $('#pinBoxes').classList.remove('is-shake'); void $('#pinBoxes').offsetWidth; $('#pinBoxes').classList.add('is-shake');
-        boxes.forEach(b => b.value = ''); boxes[0].focus();
-      }
     } finally {
       btn.disabled = false; btn.textContent = 'Entrar';
     }
@@ -67,20 +77,28 @@
 
   async function entrar() {
     $('#login').hidden = true; $('#app').hidden = false;
+    $('#demoBar').hidden = ONLINE;
+    $('#logoutBtn').textContent = ONLINE ? 'Sair' : 'Sair da demonstração';
     pararRealtime = S.aoMudar((evento, r) => {
       if (evento === 'INSERT' && r && knownIds && !knownIds.has(r.id)) toast(`🔔 Nova reserva: ${r.cliente.nome} · ${fmtDia(r.data).split(',')[0]} ${r.hora}`);
       refresh();
     });
     await refresh(true);
+    // demonstração vazia: já preenche com clientes fictícios pra ficar realista
+    if (!ONLINE && !cache.reservas.length) $('#seedBtn').click();
   }
   (async () => {
     try {
       const sessao = await S.auth.sessao();
       if (sessao && await S.auth.ehAdmin()) return entrar();
     } catch {}
-    (ONLINE ? $('#loginEmail') : boxes[0]).focus();
+    boxes[0].focus();
   })();
-  $('#logoutBtn').onclick = async () => { pararRealtime?.(); await S.auth.sair(); location.reload(); };
+  $('#logoutBtn').onclick = async () => {
+    pararRealtime?.();
+    if (ONLINE) await S.auth.sair(); else S.sairDemo();
+    location.reload();
+  };
 
   /* ---------- Carregamento ---------- */
   const hoje = () => DB.ymd(new Date());

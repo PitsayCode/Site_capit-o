@@ -503,6 +503,8 @@ svg { width: 1em; height: 1em; flex: none; }
   padding: clamp(20px, 3vw, 36px); backdrop-filter: blur(10px);
   min-height: 560px; display: flex; flex-direction: column; min-width: 0;
 }
+.demo-note { margin: 0 0 18px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; color: var(--sky-2); background: rgba(46, 163, 220, .1); border: 1px solid rgba(46, 163, 220, .35); }
+.demo-note[hidden] { display: none; }
 .wizard__steps { list-style: none; padding: 0; margin: 0 0 30px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; counter-reset: w; }
 .wizard__steps li {
   display: flex; align-items: center; gap: 10px; padding-top: 12px; border-top: 3px solid var(--line);

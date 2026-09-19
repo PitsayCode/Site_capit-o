@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=1.2" />
-  <link rel="stylesheet" href="css/admin.css?v=1.2" />
+  <link rel="stylesheet" href="css/style.css?v=1.3" />
+  <link rel="stylesheet" href="css/admin.css?v=1.3" />
 </head>
 <body class="admin">
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -33,25 +33,39 @@
 
   <!-- ========== LOGIN ========== -->
   <section class="login" id="login">
-    <form class="login__card" id="loginForm">
+    <div class="login__card">
       <img src="assets/img/logo.jpg" alt="Logo Barbearia Capitão" />
       <h1>Painel da Casa</h1>
-      <p class="muted" id="loginMsg">Entre pra acessar a agenda.</p>
-      <div class="login__fields" id="emailFields" hidden>
-        <label>E-mail <input type="email" id="loginEmail" autocomplete="username" required /></label>
-        <label>Senha <input type="password" id="loginPass" autocomplete="current-password" required /></label>
-      </div>
-      <div class="pin" id="pinBoxes" hidden>
-        <input inputmode="numeric" maxlength="1" aria-label="Dígito 1" autocomplete="off" />
-        <input inputmode="numeric" maxlength="1" aria-label="Dígito 2" autocomplete="off" />
-        <input inputmode="numeric" maxlength="1" aria-label="Dígito 3" autocomplete="off" />
-        <input inputmode="numeric" maxlength="1" aria-label="Dígito 4" autocomplete="off" />
-      </div>
-      <p class="login__err" id="loginErr" role="alert"></p>
-      <button class="btn btn--sky" type="submit" id="loginBtn">Entrar</button>
-      <p class="login__hint" id="loginHint"></p>
+
+      <!-- Demonstração -->
+      <form class="login__demo" id="demoForm">
+        <span class="login__badge">Demonstração</span>
+        <p>Quer conhecer o painel? Digite o código abaixo pra ver e testar tudo.</p>
+        <p class="login__code">Código de acesso: <b>1234</b></p>
+        <div class="pin" id="pinBoxes">
+          <input inputmode="numeric" maxlength="1" aria-label="Dígito 1" autocomplete="off" />
+          <input inputmode="numeric" maxlength="1" aria-label="Dígito 2" autocomplete="off" />
+          <input inputmode="numeric" maxlength="1" aria-label="Dígito 3" autocomplete="off" />
+          <input inputmode="numeric" maxlength="1" aria-label="Dígito 4" autocomplete="off" />
+        </div>
+        <p class="login__err" id="demoErr" role="alert"></p>
+        <button class="btn btn--sky" type="submit" id="demoBtn">Entrar na demonstração</button>
+        <p class="login__hint">Os dados da demonstração são fictícios e ficam só neste aparelho.</p>
+      </form>
+
+      <!-- Acesso real (Supabase) -->
+      <form class="login__real" id="loginForm" hidden>
+        <p class="login__or"><span>ou acesso da barbearia</span></p>
+        <div class="login__fields">
+          <label>E-mail <input type="email" id="loginEmail" autocomplete="username" required /></label>
+          <label>Senha <input type="password" id="loginPass" autocomplete="current-password" required /></label>
+        </div>
+        <p class="login__err" id="loginErr" role="alert"></p>
+        <button class="btn btn--ghost" type="submit" id="loginBtn">Entrar</button>
+      </form>
+
       <a href="index.html" class="btn btn--link">← Voltar ao site</a>
-    </form>
+    </div>
   </section>
 
   <!-- ========== APP ========== -->
@@ -87,6 +101,11 @@
           <button class="btn btn--sky btn--sm" id="newBtn" type="button">+ Encaixe</button>
         </div>
       </header>
+
+      <div class="demo-bar" id="demoBar" hidden>
+        <p><strong>Modo demonstração.</strong> Tudo aqui é fictício e fica só neste aparelho. Faça uma reserva pelo site
+        <a href="index.html#agendar" target="_blank" rel="noopener">(abrir em outra aba)</a> e veja ela aparecer aqui na hora.</p>
+      </div>
 
       <div class="block-hint" id="blockHint" hidden>
         <svg><use href="#i-lock"/></svg>
@@ -157,9 +176,9 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/config.js?v=1.2"></script>
-  <script src="js/data.js?v=1.2"></script>
-  <script src="js/store.js?v=1.2"></script>
-  <script src="js/admin.js?v=1.2"></script>
+  <script src="js/config.js?v=1.3"></script>
+  <script src="js/data.js?v=1.3"></script>
+  <script src="js/store.js?v=1.3"></script>
+  <script src="js/admin.js?v=1.3"></script>
 </body>
 </html>
